@@ -18,6 +18,7 @@
     "@pkmn/dex": "^0.7.59",
     "@pkmn/smogon": "^0.5.2",
     "@smogon/sets": "^2.0.0",
+    "gh-pages": "^6.1.0",
     "vue": "^3.3.10",
     "vue-router": "^4.2.5"
   },
