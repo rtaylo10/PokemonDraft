@@ -39,7 +39,8 @@ export default {
   props: {
     selectedGen: { type: Number, default: null },
     formatInfo: { type: Object, default: null },
-    formatList: { type: Array, default: null }
+    formatList: { type: Array, default: null },
+    numPlayers: {type: Number, default: null },
   },
 
   components: {
@@ -57,12 +58,12 @@ export default {
 
       allPokemonList: [],
 
-      numPokemonToGenerate: 4,
-      picksPerList: 2,
+      // numPokemonToGenerate: 4,
+      // picksPerList: 2,
 
-      maxRounds: 3,
-      curRound: 0,
-      numPlayers: 2,
+      // maxRounds: 3,
+      totNumTurns: 0,
+      pokemonPerTeam: 6,
       curPlayerTurn: 1,
       playerIsReady: false,
 
@@ -79,6 +80,22 @@ export default {
   },
 
   computed: {
+    numPlayersInt() {
+      return parseInt(this.numPlayers);
+    },
+
+    numPokemonToGenerate() {
+      return this.numPlayers * 2;
+    },
+
+    maxTurns() {
+      return this.pokemonPerTeam * this.numPlayers;
+    },
+
+    picksPerList() {
+      return this.numPlayers;
+    },
+
     allPokemonNames() {
       let newList = []
       for (let poke of this.allPokemonList) {
@@ -109,7 +126,7 @@ export default {
     },
 
     lastRoundOver() {
-      return this.curRound >= this.maxRounds * this.numPlayers
+      return this.totNumTurns >= this.maxTurns
     },
 
     finishedPicksThisRound() {
@@ -251,10 +268,10 @@ export default {
     },
 
     startPicking() {
+      this.totNumTurns++;
       // If the length of the generated list implies that each player has picked enough from the list
       if (this.finishedPicksThisRound && !this.lastRoundOver) {
         this.generateNewPokemon(this.curPlayerTurn)
-        this.curRound++;
       }
 
       this.playerIsReady = true;
@@ -282,7 +299,7 @@ export default {
       this.curPlayerTurn = turn;
 
       // If the length of the generated list implies that each player has picked enough from the list
-      if (this.finishedPicksThisRound && this.lastRoundOver) {
+      if (this.lastRoundOver) {
         this.showResults();
       }
     },
@@ -347,7 +364,7 @@ export default {
   }
 
   .playerBody {
-    height: 200px;
+    min-height: 200px;
   }
 
   margin: 10px 0;

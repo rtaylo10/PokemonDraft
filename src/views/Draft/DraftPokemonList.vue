@@ -1,24 +1,26 @@
 <template>
-  <div class="pokemonList">
-    <div
-      v-for="(name, index) in pkmnList"
-      class="pokeContainer"
-      :class="{canClick: canPick, duplicate: hasDuplicate(name)}"
-      :key="index"
-      @click="pickPokemon(name)"
-    >
-      <template v-if="!name">
-        <img class="pokeImg emptyImg" src="@/assets/masterball.png" :key="name" />
-        <div class="infoBox">Wildcard</div>
-      </template>
-      <template v-else>
-      <img class="pokeImg" :src="pokemonImage(name)" :key="name" />
-        <div class="infoBox">
-          <div class="pokeName">
-            {{ name }}{{ hasDuplicate(name) ? ' (dup)' : '' }}
+  <div class="pokemonListContainer">
+    <div class="pokemonList">
+      <div
+        v-for="(name, index) in pkmnList"
+        class="pokeContainer"
+        :class="{canClick: canPick, duplicate: hasDuplicate(name)}"
+        :key="index"
+        @click="pickPokemon(name)"
+      >
+        <template v-if="!name">
+          <img class="pokeImg emptyImg" src="@/assets/masterball.png" :key="name" />
+          <div class="infoBox">Wildcard</div>
+        </template>
+        <template v-else>
+          <img class="pokeImg" :src="pokemonImage(name)" :key="name" />
+          <div class="infoBox">
+            <div class="pokeName">
+              {{ name }}{{ hasDuplicate(name) ? ' (dup)' : '' }}
+            </div>
           </div>
-        </div>
-      </template>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -41,6 +43,9 @@ export default {
   computed: {
     pickedMap() {
       let newMap = {};
+      if (!this.currentPicks) {
+        return newMap;
+      }
       for(let p of this.currentPicks) {
         newMap[p] = true;
       }
@@ -57,7 +62,6 @@ export default {
     },
 
     hasDuplicate(name) {
-      console.log(this.pickedMap)
       return this.pickedMap[name] != null && this.canPick;
     },
 
@@ -83,9 +87,12 @@ export default {
 
 .pokemonList {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .pokeContainer {
+  width: 120px;
   border-radius: 5px;
   padding: 10px;
   display: flex;
@@ -105,8 +112,19 @@ export default {
   }
 }
 
+.infoBox {
+  width: 100%
+}
+
 .pokeImg {
   height: 100px;
+}
+
+.pokeName {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis
 }
 
 .infoBox {

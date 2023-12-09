@@ -13,6 +13,11 @@
         <div v-else>{{ selectedGen }}</div>
       </div>
       <div class="settingContainer">
+        <div># Players:</div>
+        <input type="number" v-if="!draftStarted" v-model="numPlayers" style="width: 30px;">
+        <div v-else>{{ numPlayers }}</div>
+      </div>
+      <div class="settingContainer">
         <div>Formats:</div>
         <div v-if="!draftStarted" class="checkboxList">
           <div class="checkboxContainer" v-for="format in formats" :key="format">
@@ -29,7 +34,7 @@
       </div>
     </div>
 
-    <DraftWindow v-if="draftStarted" :selectedGen="selectedGen" :formatList="selectedFormatsList" :formatInfo="loadedFormats" />
+    <DraftWindow v-if="draftStarted" :selectedGen="selectedGen" :numPlayers="numPlayers" :formatList="selectedFormatsList" :formatInfo="loadedFormats" />
   </div>
 </template>
 
@@ -47,13 +52,14 @@ export default {
       smogon: null,
       gens: [],
       selectedGen: 1,
+      numPlayers: 2,
 
       formats: [
-        {id: 'zu', name: 'ZU', weight: 0.5},
-        {id: 'pu', name: 'PU', weight: 0.5},
-        {id: 'nu', name: 'NU', weight: 1},
-        {id: 'ru', name: 'RU', weight: 1},
-        {id: 'uu', name: 'UU', weight: 0.4},
+        {id: 'zu', name: 'ZU', weight: 1},
+        {id: 'pu', name: 'PU', weight: 1},
+        {id: 'nu', name: 'NU', weight: 1.5},
+        {id: 'ru', name: 'RU', weight: 1.5},
+        {id: 'uu', name: 'UU', weight: 0.3},
         {id: 'ou', name: 'OU', weight: 0.1},
         {id: 'ubers', name: 'Ubers', weight: 0.05}
       ],
@@ -143,6 +149,8 @@ export default {
       for(let format of this.formats) {
         this.selectedFormats[format.id] = true;
       }
+
+      this.numPlayers = 2;
     },
 
     selectGen(gen) {
