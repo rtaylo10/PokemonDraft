@@ -49,12 +49,12 @@ export default {
       selectedGen: 1,
 
       formats: [
-        {id: 'zu', name: 'ZU', weight: 0.1},
-        {id: 'pu', name: 'PU', weight: 0.4},
-        {id: 'nu', name: 'NU', weight: 0.8},
-        {id: 'ru', name: 'RU', weight: 1.2},
-        {id: 'uu', name: 'UU', weight: 1},
-        {id: 'ou', name: 'OU', weight: 0.4},
+        {id: 'zu', name: 'ZU', weight: 0.5},
+        {id: 'pu', name: 'PU', weight: 0.5},
+        {id: 'nu', name: 'NU', weight: 1},
+        {id: 'ru', name: 'RU', weight: 1},
+        {id: 'uu', name: 'UU', weight: 0.4},
+        {id: 'ou', name: 'OU', weight: 0.1},
         {id: 'ubers', name: 'Ubers', weight: 0.05}
       ],
       selectedFormats: {},
@@ -112,7 +112,6 @@ export default {
   methods: {
     loadGen(genNum) {
       forGen(genNum).then((response) => {
-        console.log(response)
         return response;
       })
     },

@@ -1,9 +1,9 @@
 <template>
   <div class="pokemonList">
     <div
-      class="pokeContainer"
-      :class="{canClick: canPick}"
       v-for="(name, index) in pkmnList"
+      class="pokeContainer"
+      :class="{canClick: canPick, duplicate: hasDuplicate(name)}"
       :key="index"
       @click="pickPokemon(name)"
     >
@@ -15,7 +15,7 @@
       <img class="pokeImg" :src="pokemonImage(name)" :key="name" />
         <div class="infoBox">
           <div class="pokeName">
-            {{ name }}
+            {{ name }}{{ hasDuplicate(name) ? ' (dup)' : '' }}
           </div>
         </div>
       </template>
@@ -27,6 +27,7 @@
 export default {
   props: {
     pkmnList: { type: Array, default: null },
+    currentPicks: {type: Array, default: null},
     pokemonData: { type: Object, default: null},
     canPick: {type: Boolean, default: false},
   },
@@ -37,11 +38,27 @@ export default {
     }
   },
 
+  computed: {
+    pickedMap() {
+      let newMap = {};
+      for(let p of this.currentPicks) {
+        newMap[p] = true;
+      }
+
+      return newMap;
+    }
+  },
+
   methods: {
     pickPokemon(name) {
       if (this.canPick) {
         this.$emit('pick', name);
       }
+    },
+
+    hasDuplicate(name) {
+      console.log(this.pickedMap)
+      return this.pickedMap[name] != null && this.canPick;
     },
 
     pokemonImage(name) {
@@ -61,3 +78,41 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+
+.pokemonList {
+  display: flex;
+}
+
+.pokeContainer {
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &.canClick {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-background-soft);
+    }
+  }
+
+  &.duplicate {
+    filter: opacity(0.5);
+  }
+}
+
+.pokeImg {
+  height: 100px;
+}
+
+.infoBox {
+  text-align: center;
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 2px solid var(--color-border);
+}
+</style>

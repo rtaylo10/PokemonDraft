@@ -22,10 +22,10 @@
       <div>Player {{ curPlayerTurn }} Ready</div>
       <button @click.stop="startPicking">Choose</button>
     </div>
-    <DraftPokemonList
-      v-else
+    <DraftPokemonList v-else
       class="pokemonList"
       :pkmnList="remainingNames[curPlayerTurn]"
+      :currentPicks="playerTeamPicks[curPlayerTurn]"
       :pokemonData="pokemonData"
       :canPick="true"
       @pick="pickPokemon"
@@ -187,7 +187,7 @@ export default {
     },
 
     getRandPoke(pokeList, excludeList) {
-      let searchList = pokeList.slice().filter((p) => !excludeList[p])
+      let searchList = pokeList.slice().filter((p) => !excludeList[p.toLowerCase()])
       let listLen = searchList.length
       let randIndex = Math.floor(Math.random() * listLen)
 
@@ -313,7 +313,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .content-box {
   margin-top: 10px;
 }
@@ -328,33 +328,6 @@ export default {
   align-items: center;
 }
 
-.pokemonList {
-  display: flex;
-}
-
-.pokeContainer {
-  border-radius: 5px;
-  cursor: pointer;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  &:hover {
-    background: var(--color-background-soft) !important;
-  }
-}
-
-.pokeImg {
-  height: 100px;
-}
-
-.infoBox {
-  text-align: center;
-  margin-top: 5px;
-  padding-top: 5px;
-  border-top: 2px solid var(--color-border);
-}
 
 .playerResultsBox {
   .playerHeader,
