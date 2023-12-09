@@ -118,6 +118,9 @@ export default {
       let newMap = {}
       for (let format of this.formatList) {
         let info = this.formatInfo[format.id]
+        if (!info) {
+          continue;
+        }
         let pokemonNames = Object.keys(info)
         newMap[format.id] = pokemonNames
       }
@@ -244,6 +247,9 @@ export default {
       let excludedPokes = {}
       for(let i = 0; i < this.numPokemonToGenerate; ++i) {
         for (let format of this.formatList) {
+          if (!this.formatInfo[format.id]) {
+            continue;
+          }
           let formatWeight = Math.random() * format.weight
           let formatInfo = { weight: formatWeight, format: format }
           if (!highestFormat) {

@@ -5,16 +5,21 @@
       <div class="settingContainer">
         <div>Gen:</div>
         <div class="checkboxList" v-if="!draftStarted">
-            <div class="checkboxContainer" v-for="gen in gens" :key="gen">
-              {{ gen }}
-              <input :checked="selectedGen == gen" @click="selectGen(gen)" type="checkbox" name="gen" />
-            </div>
+          <div class="checkboxContainer" v-for="gen in gens" :key="gen">
+            {{ gen }}
+            <input
+              :checked="selectedGen == gen"
+              @click="selectGen(gen)"
+              type="checkbox"
+              name="gen"
+            />
+          </div>
         </div>
         <div v-else>{{ selectedGen }}</div>
       </div>
       <div class="settingContainer">
         <div># Players:</div>
-        <input type="number" v-if="!draftStarted" v-model="numPlayers" style="width: 30px;">
+        <input type="number" v-if="!draftStarted" v-model="numPlayers" style="width: 30px" />
         <div v-else>{{ numPlayers }}</div>
       </div>
       <div class="settingContainer">
@@ -34,7 +39,13 @@
       </div>
     </div>
 
-    <DraftWindow v-if="draftStarted" :selectedGen="selectedGen" :numPlayers="numPlayers" :formatList="selectedFormatsList" :formatInfo="loadedFormats" />
+    <DraftWindow
+      v-if="draftStarted"
+      :selectedGen="selectedGen"
+      :numPlayers="numPlayers"
+      :formatList="selectedFormatsList"
+      :formatInfo="loadedFormats"
+    />
   </div>
 </template>
 
@@ -125,12 +136,16 @@ export default {
     getFormatString(format) {
       return 'gen' + this.selectedGen + format.id;
     },
-  
+
     loadFormat(format) {
       let formatString = this.getFormatString(format);
-      forFormat(formatString).then((response) => {
-        this.loadedFormats[format.id] = response.stats;
-      })
+      try {
+        forFormat(formatString).then((response) => {
+          this.loadedFormats[format.id] = response.stats;
+        })
+      } catch (e) {
+        // Ignore when format isn't found
+      }
     },
 
     async loadFormats() {
@@ -139,7 +154,7 @@ export default {
         this.loadFormat(format);
       }
     },
-  
+
     setupSettings() {
       for (let i = 1; i <= this.numGens; i++) {
         this.gens.push(i);
@@ -161,7 +176,7 @@ export default {
       if (!this.canStartDraft) {
         return;
       }
-      
+
       this.draftStarting = true;
 
       this.loadFormats().then(() => {
@@ -175,7 +190,6 @@ export default {
 
 <style lang="scss" scoped>
 .settingsBox {
-
 }
 .settingContainer {
   display: flex;
