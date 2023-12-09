@@ -1,0 +1,58 @@
+@import './base.scss';
+
+#app {
+  width: 100%;
+  font-weight: normal;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+.content-box {
+  border-radius: 5px;
+  background: var(--color-background-mute);
+  padding: 5px 10px;
+}
+
+.box-title {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 2;
+  color: var(--color-heading)
+}
+
+button {
+  cursor: pointer;
+  color: var(--button-text);
+  background: var(--button-background);
+  font-size: 14px;
+  font-weight: bold;
+  padding: 6px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid  var(--button-border);
+  border-radius: 5px;
+
+  &:hover {
+    filter: opacity(0.8);
+  }
+}
