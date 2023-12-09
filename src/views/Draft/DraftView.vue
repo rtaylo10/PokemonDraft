@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <DraftWindow :started="draftStarted" :selectedGen="selectedGen" :formatList="selectedFormatsList" :formatInfo="loadedFormats" />
+    <DraftWindow v-if="draftStarted" :selectedGen="selectedGen" :formatList="selectedFormatsList" :formatInfo="loadedFormats" />
   </div>
 </template>
 

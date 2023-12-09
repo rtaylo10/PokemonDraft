@@ -1,40 +1,51 @@
 <template>
-  <div class="content-box" v-if="started">
+  <div class="content-box" v-if="showingResults">
+    <div class="box-title">Results</div>
+    <div class="playerResultsBox" v-for="playerNum in numPlayers" :key="playerNum">
+      <div class="playerHeader" @click="toggleShowPlayer(playerNum)">
+        <span class="box-title">Player {{ playerNum }}</span>
+        <span v-if="showingPlayer != playerNum"> (Show)</span>
+        <span v-else> (Hide)</span>
+      </div>
+      <div class="playerBody">
+        <DraftPokemonList
+          v-if="showingPlayer == playerNum"
+          class="pokemonList"
+          :pokemonData="pokemonData"
+          :pkmnList="playerTeamPicks[playerNum]"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="content-box" v-else>
     <div class="playerReadyBox" v-if="!playerIsReady">
       <div>Player {{ curPlayerTurn }} Ready</div>
       <button @click.stop="startPicking">Choose</button>
     </div>
-    <!-- <button @click="generateNewPokemon">Generate</button> -->
-    <div v-else class="pokemonList">
-      <div
-        class="pokeContainer"
-        v-for="(name, index) in remainingNames[curPlayerTurn]"
-        :key="index"
-        @click="pickPokemon(name)"
-      >
-        <template v-if="!name">
-          <img class="pokeImg emptyImg" src="@/assets/masterball.png" :key="name" />
-          <div class="infoBox">Wildcard</div>
-        </template>
-        <img class="pokeImg" :src="pokemonImage(name)" :key="name" />
-        <div class="infoBox">
-          <div class="pokeName">
-            {{ name }}
-          </div>
-        </div>
-      </div>
-    </div>
+    <DraftPokemonList
+      v-else
+      class="pokemonList"
+      :pkmnList="remainingNames[curPlayerTurn]"
+      :pokemonData="pokemonData"
+      :canPick="true"
+      @pick="pickPokemon"
+    />
   </div>
 </template>
 
 <script>
+import DraftPokemonList from './DraftPokemonList.vue'
 export default {
   props: {
-    started: { type: Boolean, default: false },
     selectedGen: { type: Number, default: null },
     formatInfo: { type: Object, default: null },
     formatList: { type: Array, default: null }
   },
+
+  components: {
+    DraftPokemonList,
+  },
+
   data() {
     return {
       pokemonInfoApi: 'https://pokeapi.co/api/v2/pokemon/',
@@ -46,10 +57,10 @@ export default {
 
       allPokemonList: [],
 
-      numPokemonToGenerate: 6,
-      picksPerList: 3,
+      numPokemonToGenerate: 4,
+      picksPerList: 2,
 
-      maxRounds: 6,
+      maxRounds: 3,
       curRound: 0,
       numPlayers: 2,
       curPlayerTurn: 1,
@@ -57,7 +68,8 @@ export default {
 
       playerTeamPicks: {},
 
-      showingResults: false
+      showingResults: false,
+      showingPlayer: null,
     }
   },
 
@@ -94,6 +106,18 @@ export default {
       }
 
       return newMap
+    },
+
+    lastRoundOver() {
+      return this.curRound >= this.maxRounds * this.numPlayers
+    },
+
+    finishedPicksThisRound() {
+      let genNames = this.generatedNames[this.curPlayerTurn]
+      let remNames = this.remainingNames[this.curPlayerTurn]
+
+      // If the length of the generated list implies that each player has picked enough from the list
+      return !genNames.length || genNames.length - remNames.length >= this.picksPerList;
     }
   },
 
@@ -104,6 +128,8 @@ export default {
         this.generatedNames[i] = []
         this.remainingNames[i] = []
       }
+
+      this.showingPlayer = null;
     },
 
     fetchAllPokemonList() {
@@ -161,8 +187,6 @@ export default {
     },
 
     getRandPoke(pokeList, excludeList) {
-      console.log(pokeList)
-      console.log(excludeList)
       let searchList = pokeList.slice().filter((p) => !excludeList[p])
       let listLen = searchList.length
       let randIndex = Math.floor(Math.random() * listLen)
@@ -201,13 +225,15 @@ export default {
       let highestFormat = null
       let generatedList = []
       let excludedPokes = {}
-      for (let format of this.formatList) {
-        let formatWeight = Math.random() * format.weight
-        let formatInfo = { weight: formatWeight, format: format }
-        if (!highestFormat) {
-          highestFormat = formatInfo
-        } else if (highestFormat.weight < formatWeight) {
-          highestFormat = formatInfo
+      for(let i = 0; i < this.numPokemonToGenerate; ++i) {
+        for (let format of this.formatList) {
+          let formatWeight = Math.random() * format.weight
+          let formatInfo = { weight: formatWeight, format: format }
+          if (!highestFormat) {
+            highestFormat = formatInfo
+          } else if (highestFormat.weight < formatWeight) {
+            highestFormat = formatInfo
+          }
         }
 
         let fId = highestFormat.format.id
@@ -225,22 +251,13 @@ export default {
     },
 
     startPicking() {
-      let genNames = this.generatedNames[this.curPlayerTurn]
-      let remNames = this.remainingNames[this.curPlayerTurn]
-      if (
-        !genNames.length ||
-        genNames.length - remNames.length >= this.picksPerList
-      ) {
-        this.curRound++
-        if (this.curRound == this.maxRounds * this.numPlayers) {
-          this.showResults()
-        } else {
-          this.generateNewPokemon(this.curPlayerTurn)
-          this.curRound++
-        }
+      // If the length of the generated list implies that each player has picked enough from the list
+      if (this.finishedPicksThisRound && !this.lastRoundOver) {
+        this.generateNewPokemon(this.curPlayerTurn)
+        this.curRound++;
       }
 
-      this.playerIsReady = true
+      this.playerIsReady = true;
     },
 
     rotateLists() {
@@ -260,19 +277,37 @@ export default {
       let turn = this.curPlayerTurn + 1
       if (turn > this.numPlayers) {
         turn = 1
-        this.rotateLists()
+        this.rotateLists();
       }
-      this.curPlayerTurn = turn
+      this.curPlayerTurn = turn;
+
+      // If the length of the generated list implies that each player has picked enough from the list
+      if (this.finishedPicksThisRound && this.lastRoundOver) {
+        this.showResults();
+      }
     },
 
     pickPokemon(name) {
       let list = this.playerTeamPicks[this.curPlayerTurn].slice()
       list.push(name)
-      console.log(this.curPlayerTurn)
       this.playerTeamPicks[this.curPlayerTurn] = list
       this.remainingNames[this.curPlayerTurn] = this.remainingNames[this.curPlayerTurn].filter((n) => n != name)
 
-      this.nextTurn()
+      this.nextTurn();
+    },
+
+    showResults() {
+      this.showingResults = true;
+      this.generatedNames = {};
+      this.remainingNames = {};
+    },
+
+    toggleShowPlayer(playerNum) {
+      if (this.showingPlayer == null || this.showingPlayer != playerNum) {
+        this.showingPlayer = playerNum;
+      } else {
+        this.showingPlayer = null;
+      }
     }
   }
 }
@@ -284,10 +319,12 @@ export default {
 }
 
 .playerReadyBox {
+  line-height: 1;
   width: 100%;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
 }
 
@@ -317,5 +354,35 @@ export default {
   margin-top: 5px;
   padding-top: 5px;
   border-top: 2px solid var(--color-border);
+}
+
+.playerResultsBox {
+  .playerHeader,
+  .playerBody {
+    padding: 5px 10px;
+  }
+  .playerHeader {
+    cursor: pointer;
+    border-radius: 5px 5px 0 0;
+    width: 100%;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 5px;
+
+    &:hover {
+      background: var(--color-background);
+    }
+  }
+
+  .playerBody {
+    height: 200px;
+  }
+
+  margin: 10px 0;
+  border-radius: 5px;
+  background: var(--color-background-soft);
+
+  &:first-child {
+    margin-top: 0;
+  }
 }
 </style>
