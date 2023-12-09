@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-  base: "/pokemon-draft-picks/",
+  base: "/PokemonDraft/",
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
