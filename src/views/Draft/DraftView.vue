@@ -50,17 +50,21 @@
 </template>
 
 <script>
-import { forGen, forFormat } from '@smogon/sets/index.js'
 import DraftWindow from './DraftWindow.vue'
+import BaseApi from '@/api/BaseApi';
 
 export default {
   components: { DraftWindow },
 
   data() {
     return {
-      numGens: 8,
-      isLoading: true,
+      smogonSetsLink: 'https://pkmn.github.io/smogon/data/sets/',
       smogon: null,
+      generationData: null,
+      dex: null,
+
+      numGens: 9,
+      isLoading: true,
       gens: [],
       selectedGen: 1,
       numPlayers: 2,
@@ -82,7 +86,6 @@ export default {
   },
 
   created() {
-    this.loadGen(8);
     this.setupSettings();
   },
 
@@ -127,12 +130,6 @@ export default {
   },
 
   methods: {
-    loadGen(genNum) {
-      forGen(genNum).then((response) => {
-        return response;
-      })
-    },
-
     getFormatString(format) {
       return 'gen' + this.selectedGen + format.id;
     },
@@ -140,8 +137,8 @@ export default {
     loadFormat(format) {
       let formatString = this.getFormatString(format);
       try {
-        forFormat(formatString).then((response) => {
-          this.loadedFormats[format.id] = response.stats;
+        BaseApi.get(this.smogonSetsLink + formatString + '.json').then((response) => {
+          this.loadedFormats[format.id] = response;
         })
       } catch (e) {
         // Ignore when format isn't found

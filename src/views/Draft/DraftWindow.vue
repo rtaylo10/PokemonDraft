@@ -58,10 +58,6 @@ export default {
 
       allPokemonList: [],
 
-      // numPokemonToGenerate: 4,
-      // picksPerList: 2,
-
-      // maxRounds: 3,
       totNumTurns: 0,
       pokemonPerTeam: 6,
       curPlayerTurn: 1,

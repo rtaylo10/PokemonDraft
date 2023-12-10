@@ -7,8 +7,8 @@
   "scripts": {
     "serve": "vite",
     "build": "vite build",
-    "predeploy" : "npm run build",
-    "deploy" : "gh-pages -d dist",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
     "preview": "vite preview",
     "test:unit": "vitest",
     "test:e2e": "start-server-and-test preview http://localhost:4173 'cypress run --e2e'",
@@ -17,11 +17,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@pkmn/data": "^0.7.59",
-    "@pkmn/dex": "^0.7.59",
-    "@pkmn/smogon": "^0.5.2",
-    "@smogon/sets": "^2.0.0",
+    "axios": "^1.6.2",
     "gh-pages": "^6.1.0",
+    "smogon": "^3.0.1",
     "vue": "^3.3.10",
     "vue-router": "^4.2.5"
   },
